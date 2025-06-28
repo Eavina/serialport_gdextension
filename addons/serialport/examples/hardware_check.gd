@@ -8,7 +8,7 @@ var port2_name := "" # 可选，留空则单口测试
 var loopback := false
 
 func _ready():
-    var serial1 = SerialPort.new()
+    var serial1 = SerialPortWrapper.new()
     serial1.set_baud_rate(9600)
     serial1.set_data_bits(8)
     serial1.set_parity(0)
@@ -23,7 +23,7 @@ func _ready():
     test_single_port(serial1, loopback)
 
     if port2_name != "":
-        var serial2 = SerialPort.new()
+        var serial2 = SerialPortWrapper.new()
         serial2.set_baud_rate(9600)
         serial2.set_data_bits(8)
         serial2.set_parity(0)

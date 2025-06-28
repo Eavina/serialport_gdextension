@@ -1,14 +1,15 @@
-use serialport::ClearBuffer;
+use serialport::{ClearBuffer, SerialPort};
     
 use godot::prelude::*;
 use serialport::{DataBits, FlowControl, Parity, StopBits};
 use std::collections::HashMap;
 use std::io::{Read, Write};
+use std::os::fd::AsRawFd;
 use std::time::Duration;
 
 #[derive(GodotClass)]
 #[class(base=Node)]
-pub struct SerialPort {
+pub struct SerialPortWrapper {
     base: Base<Node>,
     ports: HashMap<String, Box<dyn serialport::SerialPort>>,
     last_error: Option<String>,
@@ -21,7 +22,7 @@ pub struct SerialPort {
     timeout: u64,
 }
 #[godot_api]
-impl INode for SerialPort {
+impl INode for SerialPortWrapper {
     fn init(base: Base<Self::Base>) -> Self {
         Self{
             base,
@@ -37,7 +38,36 @@ impl INode for SerialPort {
     }
 }
 #[godot_api]
-impl SerialPort {
+impl SerialPortWrapper {
+    #[func]
+    fn try_clone_port(&mut self, port_name: String) -> Option<Gd<SerialPortWrapper>> {
+        if let Some(port) = self.ports.get(&port_name) {
+            match port.try_clone() {
+                Ok(cloned_port) => {
+                    let mut new_obj = Gd::<SerialPortWrapper>::from_init_fn(|base| SerialPortWrapper::init(base));
+                    let key = port_name.clone();
+                    {
+                        let mut new_ref = new_obj.bind_mut();
+                        new_ref.ports.insert(key, cloned_port);
+                        // 复制参数
+                        new_ref.baud_rate = self.baud_rate;
+                        new_ref.data_bits = self.data_bits;
+                        new_ref.parity = self.parity;
+                        new_ref.stop_bits = self.stop_bits;
+                        new_ref.flow_control = self.flow_control;
+                        new_ref.timeout = self.timeout;
+                    }
+                    Some(new_obj)
+                }
+                Err(e) => {
+                    self.last_error = Some(e.to_string());
+                    None
+                }
+            }
+        } else {
+            None
+        }
+    }
     #[func]
     fn list_ports(&self) -> PackedStringArray {
         let arr = match serialport::available_ports() {
@@ -51,6 +81,49 @@ impl SerialPort {
             }
         };
         PackedStringArray::from(arr)
+    }
+    #[func]
+    fn create_pseudo_terminal_pair(&mut self) -> PackedStringArray {
+        #[cfg(unix)]
+        {
+            use serialport::TTYPort;
+            use std::collections::hash_map::DefaultHasher;
+            use std::hash::{Hash, Hasher};
+            let mut arr = PackedStringArray::new();
+            match TTYPort::pair() {
+                Ok((master, slave)) => {
+                    // 生成唯一key（可用fd或name+hash）
+                    let master_name = match master.name() {
+                        Some(n) => n,
+                        None => format!("master_fd_{}", master.as_raw_fd()),
+                    };
+                    let slave_name = match slave.name() {
+                        Some(n) => n,
+                        None => format!("slave_fd_{}", slave.as_raw_fd()),
+                    };
+                    // 避免key重复，可加hash
+                    let mut hasher = DefaultHasher::new();
+                    master_name.hash(&mut hasher);
+                    let master_key = format!("{}_{}", master_name, hasher.finish());
+                    let mut hasher = DefaultHasher::new();
+                    slave_name.hash(&mut hasher);
+                    let slave_key = format!("{}_{}", slave_name, hasher.finish());
+                    // 存入 ports
+                    self.ports.insert(master_key.clone(), Box::new(master));
+                    self.ports.insert(slave_key.clone(), Box::new(slave));
+                    arr.push(&GString::from(master_key));
+                    arr.push(&GString::from(slave_key));
+                }
+                Err(e) => {
+                    self.last_error = Some(e.to_string());
+                }
+            }
+            arr
+        }
+        #[cfg(not(unix))]
+        {
+            PackedStringArray::new()
+        }
     }
 
     #[func]

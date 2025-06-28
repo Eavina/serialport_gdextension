@@ -5,7 +5,7 @@ extends Node
 @export var baud_rate := 115200
 
 func _ready():
-    var serial = SerialPort.new()
+    var serial = SerialPortWrapper.new()
     serial.set_baud_rate(baud_rate)
     serial.set_data_bits(8)
     serial.set_parity(0)
@@ -21,7 +21,7 @@ func _ready():
     set_process(true)
 
 func _process(_delta):
-    var serial = SerialPort.new()
+    var serial = SerialPortWrapper.new()
     var buf = serial.read_bytes(port_name, 1000)
     if buf.size() > 0:
         var s = ""

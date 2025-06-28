@@ -8,7 +8,7 @@ extends Node
 var test_bytes : PackedByteArray = PackedByteArray() # 可选自定义数据
 
 func _ready():
-    var serial = SerialPort.new()
+    var serial = SerialPortWrapper.new()
     serial.set_baud_rate(baudrate)
     serial.set_data_bits(8)
     serial.set_parity(0)

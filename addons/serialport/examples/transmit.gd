@@ -11,7 +11,7 @@ var send_string := "."
 var _timer := 0.0
 
 func _ready():
-    var serial = SerialPort.new()
+    var serial = SerialPortWrapper.new()
     serial.set_baud_rate(baud_rate)
     serial.set_data_bits(data_bits)
     serial.set_stop_bits(stop_bits)
@@ -33,7 +33,7 @@ func _process(delta):
     _timer += delta
     if _timer >= 1.0 / rate:
         _timer = 0.0
-        var serial = SerialPort.new()
+        var serial = SerialPortWrapper.new()
         _send_once(serial)
 
 func _send_once(serial):

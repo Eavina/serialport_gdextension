@@ -2,7 +2,7 @@ extends Node
 
 func _ready():
     # 假设 Rust 封装有 create_pseudo_terminal_pair()，返回 [master_name, slave_name]
-    var serial: SerialPort = SerialPort.new()
+    var serial: SerialPortWrapper = SerialPortWrapper.new()
     var pair = serial.create_pseudo_terminal_pair()
     if pair.size() != 2:
         print("Unable to create pseudo-terminal pair")

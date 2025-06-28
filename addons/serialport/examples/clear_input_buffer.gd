@@ -2,10 +2,10 @@ extends Node
 
 var port_name := "/dev/ttyUSB0"
 var baud_rate := 9600
-var serial: SerialPort = null
+var serial: SerialPortWrapper = null
 
 func _ready():
-    serial = SerialPort.new()
+    serial = SerialPortWrapper.new()
     serial.set_baud_rate(baud_rate)
     serial.set_data_bits(8)
     serial.set_parity(0)

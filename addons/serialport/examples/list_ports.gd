@@ -1,7 +1,7 @@
 extends  Node
 
 func _ready():
-    var serial: SerialPort = SerialPort.new()
+    var serial: SerialPortWrapper = SerialPortWrapper.new()
     var ports = serial.list_ports()
     ports.sort() # 保持输出顺序一致
 

@@ -2,17 +2,17 @@ extends Node
 
 var port_name := ""
 var baud_rate := 9600
-var serial: SerialPort = null
-var serial_clone: SerialPort = null
+var serial: SerialPortWrapper = null
+var serial_clone: SerialPortWrapper = null
 var send_timer: Timer = null
 
 func _ready():
-    var ports = SerialPort.new().list_ports()
+    var ports = SerialPortWrapper.new().list_ports()
     if ports.size() == 0:
         print("No serial port")
         return
     port_name = ports[0]
-    serial = SerialPort.new()
+    serial = SerialPortWrapper.new()
     serial.set_baud_rate(baud_rate)
     serial.set_data_bits(8)
     serial.set_parity(0)
@@ -23,7 +23,7 @@ func _ready():
         print("Failed to open serial port: %s" % serial.get_last_error())
         return
 
-    # 克隆端口（假设 Rust 封装支持 try_clone_port 返回新 SerialPort 实例）
+    # 克隆端口（假设 Rust 封装支持 try_clone_port 返回新 SerialPortWrapper 实例）
     serial_clone = serial.try_clone_port(port_name)
     if serial_clone == null:
         print("Failed to clone serial port")
