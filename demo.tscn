@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://bn6swp5h0ul25"]
+
+[ext_resource type="Script" uid="uid://17fv62eghaiv" path="res://addons/serialport/examples/list_ports.gd" id="1_5hfv0"]
+[ext_resource type="Script" uid="uid://d0ef5nrv106om" path="res://addons/serialport/examples/look_back.gd" id="2_0bhed"]
+
+[node name="Demo" type="Node2D"]
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("1_5hfv0")
+
+[node name="Node2" type="Node" parent="."]
+script = ExtResource("2_0bhed")

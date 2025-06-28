@@ -1,0 +1,12 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+.DS_Store
+
+# Visual Studio Code specific ignores
+.vscode/
+.idea/
+
+# Android keystore
+android-release.keystore
+Build

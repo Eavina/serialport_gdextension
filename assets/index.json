@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "assets": {
+    "assets/textures/icon.svg": {
+      "address": "Icon",
+      "bundle": 0,
+      "depend_assets": []
+    },
+    "assets/textures/bg.jpg": {
+      "address": "Background",
+      "bundle": 0,
+      "depend_assets": []
+    }
+  },
+  "bundles": [
+    {
+      "name": "Bundle1",
+      "hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 2048,
+      "depend_bundles": []
+    }
+  ]
+}
